@@ -1,10 +1,9 @@
 module LEAN-SYNTAX
-  imports DOMAINS
+  imports DOMAINS-SYNTAX
 
-  syntax NIdx ::= r"[0-9]+"  [token]
+  syntax NIdx ::= Int
+  syntax UIdx ::= Int
 
-  // FIXME the Id sort is a hack -- String would be preferable
-  // but it expects the value to be wrapped in quotation marks
   syntax NDef ::= NIdx "#NS" NIdx Id
                 | NIdx "#NI" NIdx Int
 
@@ -14,8 +13,9 @@ endmodule
 
 module LEAN
   imports LEAN-SYNTAX
+  imports DOMAINS
 
-  rule I1:Instrs I2:Instrs => I1 ~> I2  [structural]
+  rule Is1:Instrs Is2:Instrs => Is1 ~> Is2  [structural]
 
   //syntax KResult ::= Int | Bool
 
@@ -25,15 +25,22 @@ module LEAN
                   <exit-code exit="true"> 0 </exit-code>
                 </T>
 
-  rule Tgt #NI Src TgtN => Tgt #NS Src String2Id(Int2String(TgtN))
+  syntax HName ::= Id | HName Id
 
-  rule <k> Tgt #NS Src TgtN => . ...</k>
+  rule Tgt #NI Src X => Tgt #NS Src String2Id(Int2String(X))
+
+  rule <k> Tgt #NS 0 Name => . ...</k>
+     <names> Names => Names[Tgt <- Name] </names>
+
+  rule <k> Tgt #NS Src Name => . ...</k>
        <names>
-         Src |-> SrcN
-         Names => Names[Tgt <- SrcN +String "." +String Id2String(TgtN)]
+         (Src |-> SrcHName)
+         (Names => Names[Tgt <- SrcHName Name])
        </names>
+    when Tgt =/=K Src
 
-  rule <k> Tgt #NS 0 TgtN => . ...</k>
-       <names> Names => Names[Tgt <- Id2String(TgtN)] </names>
+  rule <k> Tgt #NS Src Name => . ...</k>
+       <names>... Src |-> (SrcHName => SrcHName Name) ...</names>
+    when Tgt ==K Src
 
 endmodule
