@@ -11,10 +11,10 @@ all: lean run
 
 lean : lean-kompiled/timestamp
 lean-kompiled/timestamp : lean.k
-	$(RV_KOMPILE) -v -O2 lean.k
+	$(RV_KOMPILE) $(RV_OPTS) -O2 lean.k
 
 run : lean
-	$(RV_KRUN) -v $(LEANOUT)
+	$(RV_KRUN) $(RV_OPTS) $(LEANOUT)
 
 ast : lean
-	$(RV_KAST) -v $(LEANOUT)
+	$(RV_KAST) $(RV_OPTS) $(LEANOUT)
