@@ -24,6 +24,12 @@
     8 |-> App ( Const ( vector , ListItem ( 1 ) ) , Const ( nat , .List ) )
     9 |-> App ( App ( Const ( vector , ListItem ( 1 ) ) , Const ( nat , .List ) ) , App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , Const ( nat zero , .List ) ) ) ) )
   </expressions>
+  <def-types>
+    .Map
+  </def-types>
+  <def-values>
+    .Map
+  </def-values>
   <exit-code>
     0
   </exit-code>

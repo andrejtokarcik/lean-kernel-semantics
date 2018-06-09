@@ -13,10 +13,16 @@
   </universes>
   <expressions>
     1 |-> Sort ( 1 )
-    2 |-> DeBruijn ( 0 )
-    3 |-> Lambda ( #BD , A a , DeBruijn ( 0 ) , DeBruijn ( 0 ) )
-    4 |-> Lambda ( #BI , A , Sort ( 1 ) , Lambda ( #BD , A a , DeBruijn ( 0 ) , DeBruijn ( 0 ) ) )
+    2 |-> # 0
+    3 |-> Lambda ( #BD , A a , # 0 , # 0 )
+    4 |-> Lambda ( #BI , A , Sort ( 1 ) , Lambda ( #BD , A a , # 0 , # 0 ) )
   </expressions>
+  <def-types>
+    .Map
+  </def-types>
+  <def-values>
+    .Map
+  </def-values>
   <exit-code>
     0
   </exit-code>

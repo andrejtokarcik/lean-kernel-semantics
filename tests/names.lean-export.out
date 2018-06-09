@@ -15,6 +15,12 @@
   <expressions>
     .Map
   </expressions>
+  <def-types>
+    .Map
+  </def-types>
+  <def-values>
+    .Map
+  </def-values>
   <exit-code>
     0
   </exit-code>
