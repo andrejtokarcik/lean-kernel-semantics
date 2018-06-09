@@ -1,2 +1,3 @@
-lean-kompiled
+*-kompiled/
 .krun*
+.depend

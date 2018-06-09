@@ -1,4 +1,4 @@
-module LEAN-SYNTAX
+module LEAN-KERNEL-SYNTAX
   imports DOMAINS-SYNTAX
 
   syntax NIdx  ::= Int
@@ -26,8 +26,8 @@ module LEAN-SYNTAX
                   | Instrs Instrs  [right]
 endmodule
 
-module LEAN
-  imports LEAN-SYNTAX
+module LEAN-KERNEL
+  imports LEAN-KERNEL-SYNTAX
   imports DOMAINS
 
   syntax List ::= lookupMulti(Map, Set)  [function]

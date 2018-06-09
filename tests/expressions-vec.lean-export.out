@@ -1,0 +1,30 @@
+<T>
+  <k>
+    .
+  </k>
+  <names>
+    0 |-> *empty*
+    1 |-> nat
+    2 |-> nat zero
+    3 |-> nat succ
+    4 |-> vector
+  </names>
+  <universes>
+    0 |-> 0
+    1 |-> 1
+  </universes>
+  <expressions>
+    1 |-> Const ( nat zero , .List )
+    2 |-> Const ( nat succ , .List )
+    3 |-> App ( Const ( nat succ , .List ) , Const ( nat zero , .List ) )
+    4 |-> App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , Const ( nat zero , .List ) ) )
+    5 |-> App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , Const ( nat zero , .List ) ) ) )
+    6 |-> Const ( vector , ListItem ( 1 ) )
+    7 |-> Const ( nat , .List )
+    8 |-> App ( Const ( vector , ListItem ( 1 ) ) , Const ( nat , .List ) )
+    9 |-> App ( App ( Const ( vector , ListItem ( 1 ) ) , Const ( nat , .List ) ) , App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , App ( Const ( nat succ , .List ) , Const ( nat zero , .List ) ) ) ) )
+  </expressions>
+  <exit-code>
+    0
+  </exit-code>
+</T>

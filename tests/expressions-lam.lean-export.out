@@ -1,0 +1,23 @@
+<T>
+  <k>
+    .
+  </k>
+  <names>
+    0 |-> *empty*
+    1 |-> A
+    2 |-> A a
+  </names>
+  <universes>
+    0 |-> 0
+    1 |-> 1
+  </universes>
+  <expressions>
+    1 |-> Sort ( 1 )
+    2 |-> DeBruijn ( 0 )
+    3 |-> Lambda ( #BD , A a , DeBruijn ( 0 ) , DeBruijn ( 0 ) )
+    4 |-> Lambda ( #BI , A , Sort ( 1 ) , Lambda ( #BD , A a , DeBruijn ( 0 ) , DeBruijn ( 0 ) ) )
+  </expressions>
+  <exit-code>
+    0
+  </exit-code>
+</T>

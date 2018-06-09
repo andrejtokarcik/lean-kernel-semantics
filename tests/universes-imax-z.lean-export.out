@@ -1,0 +1,25 @@
+<T>
+  <k>
+    .
+  </k>
+  <names>
+    0 |-> *empty*
+    1 |-> l1
+    2 |-> l2
+  </names>
+  <universes>
+    0 |-> 0
+    1 |-> 1
+    2 |-> 2
+    3 |-> Named ( l1 )
+    4 |-> Named ( l2 )
+    5 |-> Max ( 2 , Named ( l1 ) )
+    6 |-> 0
+  </universes>
+  <expressions>
+    .Map
+  </expressions>
+  <exit-code>
+    0
+  </exit-code>
+</T>

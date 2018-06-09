@@ -1,20 +1,10 @@
-RV_PATH = /home/andrej/Documents/k-project/rv-k/k-distribution/target/release/k/
-RV_KOMPILE := $(RV_PATH)/bin/kompile
-RV_KRUN := $(RV_PATH)/bin/krun
-RV_KAST := $(RV_PATH)/bin/kast
+RV_PATH := /home/andrej/Documents/k-project/rv-k/k-distribution/target/release/k/
+DEF = lean-kernel
+EXT = lean-export
+KOPMILE_FLAGS = -O2
 
-LEANOUT ?= test.leanout
+include $(RV_PATH)/include/ktest.mak
 
-.PHONY: all lean run ast
-
-all: lean run
-
-lean : lean-kompiled/timestamp
-lean-kompiled/timestamp : lean.k
-	$(RV_KOMPILE) $(RV_OPTS) -O2 lean.k
-
-run : lean
-	$(RV_KRUN) $(RV_OPTS) $(LEANOUT)
-
-ast : lean
-	$(RV_KAST) $(RV_OPTS) $(LEANOUT)
+RUNME ?= runme.lean-export
+runme: kompile
+	$(KRUN) $(KRUN_FLAGS) -d $(DEFDIR) $(RUNME)
