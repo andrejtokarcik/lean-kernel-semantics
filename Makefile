@@ -1,7 +1,8 @@
 RV_PATH := /home/andrej/Documents/k-project/rv-k/k-distribution/target/release/k/
 DEF = lean-kernel
 EXT = lean-export
-KOPMILE_FLAGS = -O2
+KOMPILE_FLAGS = -O2
+# --backend java
 
 include $(RV_PATH)/include/ktest.mak
 

@@ -5,9 +5,9 @@
   <names>
     0 |-> *empty*
     1 |-> foo
-    2 |-> foo bla
-    3 |-> foo bla 1
-    4 |-> foo bla 1 boo
+    2 |-> foo.bla
+    3 |-> foo.bla.1
+    4 |-> foo.bla.1.boo
   </names>
   <universes>
     0 |-> 0

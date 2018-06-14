@@ -11,10 +11,10 @@
     0 |-> 0
     1 |-> 1
     2 |-> 2
-    3 |-> Named ( l1 )
-    4 |-> Named ( l2 )
-    5 |-> Max ( 2 , Named ( l1 ) )
-    6 |-> Max ( Max ( 2 , Named ( l1 ) ) , 2 )
+    3 |-> l1
+    4 |-> l2
+    5 |-> Max ( 2 , l1 )
+    6 |-> Max ( Max ( 2 , l1 ) , 2 )
   </universes>
   <expressions>
     .Map

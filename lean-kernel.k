@@ -2,9 +2,9 @@ module LEAN-KERNEL-SYNTAX
   imports DOMAINS-SYNTAX
 
   syntax NIdx  ::= Int
-  syntax NIdxs ::= List{NIdx," "}
+  syntax NIdxs ::= List{NIdx, " "}
   syntax UIdx  ::= Int
-  syntax UIdxs ::= List{UIdx," "}
+  syntax UIdxs ::= List{UIdx, " "}
   syntax EIdx  ::= Int
 
   syntax NCmd ::= NIdx "#NS" NIdx Id
@@ -15,13 +15,13 @@ module LEAN-KERNEL-SYNTAX
                 | UIdx "#UIM" UIdx UIdx
                 | UIdx "#UP"  NIdx
 
-  syntax EInfo ::= "#BD" | "#BI" | "#BS" | "#BC"
+  syntax EBnd ::= "#BD" | "#BI" | "#BS" | "#BC"
   syntax ECmd ::= EIdx "#EV" Int
                 | EIdx "#ES" UIdx
                 | EIdx "#EC" NIdx UIdxs
                 | EIdx "#EA" EIdx EIdx
-                | EIdx "#EL" EInfo NIdx EIdx EIdx
-                | EIdx "#EP" EInfo NIdx EIdx EIdx
+                | EIdx "#EL" EBnd NIdx EIdx EIdx
+                | EIdx "#EP" EBnd NIdx EIdx EIdx
 
   syntax DefCmd ::= "#DEF" NIdx EIdx EIdx NIdxs
                   | "#AX"  NIdx EIdx      NIdxs
@@ -34,20 +34,7 @@ module LEAN-KERNEL
   imports LEAN-KERNEL-SYNTAX
   imports DOMAINS
 
-  syntax List ::= lookupMulti(Map, Set)  [function]
-  rule lookupMulti(M, Keys) => values(removeAll(M, keys(M) -Set Keys))
-
-  syntax Set ::= NIdxs2Set(NIdxs)  [function]
-  rule NIdxs2Set(.NIdxs) => .Set
-  rule NIdxs2Set(NIdx NIdxs) => SetItem(NIdx) NIdxs2Set(NIdxs)
-
-  syntax Set ::= UIdxs2Set(UIdxs)  [function]
-  rule UIdxs2Set(.UIdxs) => .Set
-  rule UIdxs2Set(UIdx UIdxs) => SetItem(UIdx) UIdxs2Set(UIdxs)
-
   rule Is1:Cmds Is2:Cmds => Is1 ~> Is2  [structural]
-
-  //syntax KResult ::= Int | Bool
 
   configuration <T>
                   <k color="green"> $PGM:Cmds </k>
@@ -59,31 +46,46 @@ module LEAN-KERNEL
                   <exit-code exit="true"> 0 </exit-code>
                 </T>
 
+  /*** Helper functions ***/
+
+  syntax List ::= lookupMulti(Map, Set)  [function]
+  rule lookupMulti(M, Keys) => values(removeAll(M, keys(M) -Set Keys))
+
+  syntax Set ::= NIdxs2Set(NIdxs)  [function]
+  rule NIdxs2Set(.NIdxs) => .Set
+  rule NIdxs2Set(NIdx NIdxs) => SetItem(NIdx) NIdxs2Set(NIdxs)
+
+  syntax Set ::= UIdxs2Set(UIdxs)  [function]
+  rule UIdxs2Set(.UIdxs) => .Set
+  rule UIdxs2Set(UIdx UIdxs) => SetItem(UIdx) UIdxs2Set(UIdxs)
+
   /*** Hierarchical names ***/
 
-  syntax HierName ::= "*empty*" | Id | HierName Id
+  syntax HierName ::= "*empty*" | Id
+                    | "SubName" HierName Id  [format(%2.%3)]
 
-  rule *empty* Id => Id  [structural, anywhere]
+  rule SubName *empty* Id => Id  [structural, anywhere]
 
   rule Tgt #NI NIdx X => Tgt #NS NIdx String2Id(Int2String(X))  [structural]
 
   rule <k> Tgt #NS NIdx Id => . ...</k>
-       <names> Names (NIdx |-> N) (. => Tgt |-> N Id) </names>
+       <names> Names (NIdx |-> N) (. => Tgt |-> SubName N Id) </names>
     requires notBool(Tgt in_keys(Names) orBool Tgt ==K NIdx)
 
   /*** Universe terms ***/
 
-  syntax Universe ::= Named(HierName) | Int | Succ(Universe)
+  syntax Universe ::= "Named" HierName  [format(%2)]
+                    | Int | Succ(Universe)
                     | Max(Universe, Universe) | IMax(Universe, Universe)
 
-  rule Succ(U:Int) => U +Int 1                           [structural, anywhere]
-  rule Max(U1:Int, U2:Int) => maxInt(U1, U2)             [structural, anywhere]
-  rule IMax(_, 0) => 0                                   [structural, anywhere]
-  rule IMax(U1, U2:Int) => Max(U1, U2) when U2 =/=Int 0  [structural, anywhere]
+  rule Succ(U:Int) => U +Int 1                           [/*structural,*/ anywhere]
+  rule Max(U1:Int, U2:Int) => maxInt(U1, U2)             [/*structural,*/ anywhere]
+  rule IMax(_, 0) => 0                                   [/*structural,*/ anywhere]
+  rule IMax(U1, U2:Int) => Max(U1, U2) when U2 =/=Int 0  [/*structural,*/ anywhere]
 
   rule <k> Tgt #UP NIdx => . ...</k>
        <names>... NIdx |-> N ...</names>
-       <universes> Us (. => Tgt |-> Named(N)) </universes>
+       <universes> Us (. => Tgt |-> Named N) </universes>
     requires notBool(Tgt in_keys(Us))
 
   rule <k> Tgt #US UIdx => . ...</k>
@@ -102,31 +104,42 @@ module LEAN-KERNEL
 
   /*** Exprressions ***/
 
-  syntax Expr ::= Sort(Universe)
-                | "#" Int  [klabel(DeBruijn)]
-                | Const(HierName, List)
-                | App(Expr, Expr)
-                | Lambda(EInfo, HierName, Expr, Expr)
-                | Pi    (EInfo, HierName, Expr, Expr)
+  syntax Binder ::= "BindDef"      HierName Expr  [format((%2 : %3))]
+                  | "BindImpl"     HierName Expr  [format({%2 : %3})]
+                  | "BindWeakImpl" HierName Expr  [format({{%2 : %3}})]
+                  | "BindClass"    HierName Expr  [format([%2 : %3])]
+
+  syntax Binder ::= formBinder(EBnd, HierName, Expr)  [function]
+  rule formBinder(#BD, N, T) => BindDef N T
+  rule formBinder(#BI, N, T) => BindImpl N T
+  rule formBinder(#BS, N, T) => BindWeakImpl N T
+  rule formBinder(#BC, N, T) => BindClass N T
+
+  syntax Expr ::= "Sort" Universe        [format(%2)]
+                | "DeBruijn" Int         [format(#%2)]
+                | "Const" HierName List  [format(%2)]
+                | "App" Expr Expr        [format(%2 (%3))]
+                | "Lam" Binder Expr      [format(λ %2 → %3)]
+                | "Pi"  Binder Expr      [format(Π %2 → %3)]
 
   rule <k> Tgt #ES UIdx => . ...</k>
        <universes>... UIdx |-> U ...</universes>
-       <expressions> Exprs (. => Tgt |-> Sort(U)) </expressions>
+       <expressions> Exprs (. => Tgt |-> Sort U) </expressions>
     requires notBool(Tgt in_keys(Exprs))
 
   rule <k> Tgt #EV X => . ...</k>
-       <expressions> Exprs (. => Tgt |-> # X) </expressions>
+       <expressions> Exprs (. => Tgt |-> DeBruijn X) </expressions>
     requires notBool(Tgt in_keys(Exprs))
 
   rule <k> Tgt #EC NIdx UIdxs => . ...</k>
        <names>... NIdx |-> N ...</names>
        <universes> Us </universes>
-       <expressions> Exprs (. => Tgt |-> Const(N, lookupMulti(Us, UIdxs2Set(UIdxs)))) </expressions>
+       <expressions> Exprs (. => Tgt |-> Const N lookupMulti(Us, UIdxs2Set(UIdxs))) </expressions>
     requires notBool(Tgt in_keys(Exprs))
 
   rule <k> Tgt #EA FIdx AIdx => . ...</k>
        <expressions> Exprs (FIdx |-> F) (AIdx |-> A)
-                     (. => Tgt |-> App(F, A)) </expressions>
+                     (. => Tgt |-> App F A) </expressions>
     requires notBool(Tgt in_keys(Exprs) orBool Tgt ==K FIdx orBool Tgt ==K AIdx)
 
   // pros of expanding the definition components upon storing in config
@@ -139,35 +152,36 @@ module LEAN-KERNEL
   // - duplicating structures / memory waste / performance hit
   // - may needlessly expand what does not get used at all
 
-  rule <k> Tgt #EL Info NIdx TIdx EIdx => . ...</k>
+  rule <k> Tgt #EL BndType NIdx TIdx EIdx => . ...</k>
        <names>... NIdx |-> N ...</names>
        <expressions> Exprs (TIdx |-> T) (EIdx |-> E)
-                     (. => Tgt |-> Lambda(Info, N, T, E)) </expressions>
+                     (. => Tgt |-> Lam formBinder(BndType, N, T) E) </expressions>
     requires notBool(Tgt in_keys(Exprs) orBool Tgt ==K TIdx orBool Tgt ==K EIdx)
 
-  rule <k> Tgt #EP Info NIdx TIdx EIdx => . ...</k>
+  rule <k> Tgt #EP BndType NIdx TIdx EIdx => . ...</k>
        <names>... NIdx |-> N ...</names>
        <expressions> Exprs (TIdx |-> T) (EIdx |-> E)
-                     (. => Tgt |-> Pi(Info, N, T, E)) </expressions>
+                     (. => Tgt |-> Pi formBinder(BndType, N, T) E) </expressions>
     requires notBool(Tgt in_keys(Exprs) orBool Tgt ==K TIdx orBool Tgt ==K EIdx)
 
   /*** Definitions and Axioms ***/
 
-  syntax DefObj ::= Expr | UPolymorphic(Expr, List)
+  syntax DefObj ::= Expr
+                  | Expr "inUniverses" List  [format(%1)]
 
-  rule UPolymorphic(E, .List) => E  [structural, anywhere]
+  rule E inUniverses .List => E  [structural, anywhere]
 
   rule <k> #DEF NIdx TIdx EIdx NIdxs => . ...</k>
        <names> Names (NIdx |-> N) </names>
        <expressions>... (TIdx |-> T) (EIdx |-> E) ...</expressions>
-       <def-types> DefTypes (. => N |-> UPolymorphic(T, lookupMulti(Names, NIdxs2Set(NIdxs)))) </def-types>
+       <def-types> DefTypes (. => N |-> T inUniverses lookupMulti(Names, NIdxs2Set(NIdxs))) </def-types>
        <def-values> DefVals (. => N |-> E) </def-values>
     requires notBool(N in_keys(DefTypes)) andBool notBool(N in_keys(DefVals))
 
   rule <k> #AX NIdx TIdx NIdxs => . ...</k>
        <names> Names (NIdx |-> N) </names>
        <expressions>... TIdx |-> T ...</expressions>
-       <def-types> DefTypes (. => N |-> UPolymorphic(T, lookupMulti(Names, NIdxs2Set(NIdxs)))) </def-types>
+       <def-types> DefTypes (. => N |-> T inUniverses lookupMulti(Names, NIdxs2Set(NIdxs))) </def-types>
     requires notBool(N in_keys(DefTypes))
 
 endmodule
