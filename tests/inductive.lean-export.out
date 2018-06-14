@@ -1,0 +1,44 @@
+<T>
+  <k>
+    .
+  </k>
+  <names>
+    0 |-> *empty*
+    1 |-> u
+    2 |-> list
+    3 |-> alpha
+    4 |-> list.nil
+    5 |-> list.cons
+    6 |-> a
+  </names>
+  <universes>
+    0 |-> 0
+    1 |-> u
+  </universes>
+  <expressions>
+    0 |-> u
+    1 |-> Π (alpha : u) → u
+    2 |-> list
+    3 |-> #0
+    4 |-> list (#0)
+    5 |-> Π (alpha : u) → list (#0)
+    6 |-> #1
+    7 |-> list (#1)
+    8 |-> #2
+    9 |-> list (#2)
+    10 |-> Π (a : list (#1)) → list (#2)
+    11 |-> Π (a : #0) → Π (a : list (#1)) → list (#2)
+    12 |-> Π {alpha : u} → Π (a : #0) → Π (a : list (#1)) → list (#2)
+  </expressions>
+  <def-types>
+    list |-> Π (alpha : u) → u
+    list.cons |-> Π {alpha : u} → Π (a : #0) → Π (a : list (#1)) → list (#2)
+    list.nil |-> Π (alpha : u) → list (#0)
+  </def-types>
+  <def-values>
+    .Map
+  </def-values>
+  <exit-code>
+    0
+  </exit-code>
+</T>

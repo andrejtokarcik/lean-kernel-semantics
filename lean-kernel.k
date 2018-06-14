@@ -26,7 +26,11 @@ module LEAN-KERNEL-SYNTAX
   syntax DefCmd ::= "#DEF" NIdx EIdx EIdx NIdxs
                   | "#AX"  NIdx EIdx      NIdxs
 
-  syntax Cmds ::= NCmd | UCmd | ECmd | DefCmd
+  syntax IndTailIdx  ::= NIdx | EIdx
+  syntax IndTailIdxs ::= List{IndTailIdx, " "}
+  syntax IndCmd      ::= "#IND" Int NIdx EIdx Int IndTailIdxs
+
+  syntax Cmds ::= NCmd | UCmd | ECmd | DefCmd | IndCmd
                 | Cmds Cmds  [right]
 endmodule
 
@@ -183,5 +187,27 @@ module LEAN-KERNEL
        <expressions>... TIdx |-> T ...</expressions>
        <def-types> DefTypes (. => N |-> T inUniverses lookupMulti(Names, NIdxs2Set(NIdxs))) </def-types>
     requires notBool(N in_keys(DefTypes))
+
+  /*** Inductive definitions ***/
+
+  syntax IndIntro  ::= NIdx EIdx
+  syntax IndIntros ::= List{IndIntro, " "}
+  syntax IndTail   ::= IndIntros NIdxs
+  syntax IndCmd    ::= "#IND" Int NIdx EIdx IndTail
+
+  syntax IndTail ::= extractIndTail(Int, IndTailIdxs)              [function]
+                   | #extractIndTail(Int, IndTailIdxs, IndIntros)  [function]
+  rule extractIndTail(NumIntros, IndTailIdxs) => #extractIndTail(NumIntros, IndTailIdxs, .IndIntros)
+  rule #extractIndTail(0, NIdxs, IndIntros) => IndIntros NIdxs
+  rule #extractIndTail(NumIntros, NIdx (TIdx IndTailIdxs), IndIntros)
+    => #extractIndTail(NumIntros -Int 1, IndTailIdxs, (NIdx TIdx) IndIntros)  [owise]
+
+  rule #IND NumParams NIdx TIdx NumIntros IndTailIdxs
+    => #IND NumParams NIdx TIdx extractIndTail(NumIntros, IndTailIdxs)  [structural]
+
+  rule <k> #IND NumParams NIdx TIdx (.IndIntros NIdxs) => #AX NIdx TIdx NIdxs ...</k>
+
+  rule <k> #IND NumParams NIdx TIdx (((IntroNIdx IntroTIdx) Intros) NIdxs)
+        => #AX IntroNIdx IntroTIdx NIdxs ~> #IND NumParams NIdx TIdx (Intros NIdxs) ...</k>
 
 endmodule
