@@ -106,7 +106,7 @@ module LEAN-KERNEL
                    (. => Tgt |-> IMax(U1, U2)) </universes>
     requires notBool(Tgt in_keys(Us) orBool Tgt ==K UIdx1 orBool Tgt ==K UIdx2)
 
-  /*** Exprressions ***/
+  /*** Expressions ***/
 
   syntax Binder ::= "BindDef"      HierName Expr  [format((%2 : %3))]
                   | "BindImpl"     HierName Expr  [format({%2 : %3})]
@@ -208,6 +208,6 @@ module LEAN-KERNEL
   rule <k> #IND NumParams NIdx TIdx (.IndIntros NIdxs) => #AX NIdx TIdx NIdxs ...</k>
 
   rule <k> #IND NumParams NIdx TIdx (((IntroNIdx IntroTIdx) Intros) NIdxs)
-        => #AX IntroNIdx IntroTIdx NIdxs ~> #IND NumParams NIdx TIdx (Intros NIdxs) ...</k>
+    => #AX IntroNIdx IntroTIdx NIdxs ~> #IND NumParams NIdx TIdx (Intros NIdxs) ...</k>
 
 endmodule

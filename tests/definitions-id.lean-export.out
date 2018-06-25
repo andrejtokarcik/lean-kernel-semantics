@@ -1,0 +1,34 @@
+<T>
+  <k>
+    .
+  </k>
+  <names>
+    0 |-> *empty*
+    1 |-> id
+    2 |-> l
+    3 |-> A
+    4 |-> a
+  </names>
+  <universes>
+    0 |-> 0
+    1 |-> l
+  </universes>
+  <expressions>
+    0 |-> l
+    1 |-> #0
+    2 |-> #1
+    3 |-> Π (a : #0) → #1
+    4 |-> Π {A : l} → Π (a : #0) → #1
+    5 |-> λ (a : #0) → #0
+    6 |-> λ {A : l} → λ (a : #0) → #0
+  </expressions>
+  <def-types>
+    id |-> Π {A : l} → Π (a : #0) → #1
+  </def-types>
+  <def-values>
+    id |-> λ {A : l} → λ (a : #0) → #0
+  </def-values>
+  <exit-code>
+    0
+  </exit-code>
+</T>
